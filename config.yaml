@@ -1,0 +1,29 @@
+# List of LLM models configured in LiteLLM Proxy
+model_list:
+  # Primary LLM model routed to Groq provider
+  - model_name: voice-primary
+    litellm_params: 
+      model: groq/openai/gpt-oss-120b
+      api_key: os.environ/GROQ_API_KEY
+
+  # Secondary fallback LLM model routed to Anthropic provider
+  - model_name: voice-secondary
+    litellm_params: 
+      model: anthropic/claude-sonnet-5-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+# Router configuration for request handling, timeouts, and fallbacks
+router_settings:
+  timeout: 4 # Request timeout in seconds before triggering fallback
+  num_retries: 1 # Number of retry attempts before failing over
+  fallbacks:
+    - voice-primary: ["voice-secondary"] # Fallback mapping if primary model fails
+
+# General settings for authentication and access control
+general_settings:
+  master_key: sk-local-test-1234 # Master API key to authenticate requests to the gateway
+
+# LiteLLM Proxy configuration for monitoring and observability
+litellm_settings:
+  callbacks: ["prometheus"] # Enable Prometheus metrics integration
+  require_auth_for_metrics_endpoint: false # Allow unauthenticated metric scraping by Prometheus

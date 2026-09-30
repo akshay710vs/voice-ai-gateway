@@ -1,0 +1,16 @@
+services:
+  # Prometheus service for metrics collection and storage
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090" # Expose Prometheus web UI and API port
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml # Mount host configuration into container
+
+  # Grafana service for visualization dashboards
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000" # Expose Grafana web UI port
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin # Default admin credentials for initial access

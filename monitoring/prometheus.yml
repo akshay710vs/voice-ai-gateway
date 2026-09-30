@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 5s # Frequency at which Prometheus scrapes metrics targets
+
+scrape_configs:
+  # Target configuration for scraping LiteLLM proxy metrics
+  - job_name: 'litellm'
+    static_configs:
+      - targets: ['host.docker.internal:4000'] # Points to local LiteLLM Proxy endpoint running on port 4000
