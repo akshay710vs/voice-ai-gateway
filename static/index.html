@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Voice AI Demo</title>
+</head>
+
+<body style="font-family: sans-serif; text-align: center; margin-top: 50px;">
+    <h1>Voice AI Gateway Demo</h1>
+    <button id="talkBtn" style="font-size: 24px; padding: 20px 40px;">Hold to Talk</button>
+    <p id="status">Press and hold the button, speak, then release.</p>
+    <audio id="replayAudio" controls style="margin-top: 20px;"></audio>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        const btn = document.getElementById('talkBtn');
+        const status = document.getElementById('status');
+        const replayAudio = document.getElementById('replayAudio');
+
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+
+            mediaRecorder.onstop = async () => {
+                const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                audioChunks = [];
+                status.textContent = "Processing...";
+
+                const formData = new FormData();
+                formData.append("audio", blob, "input.webm");
+                const response = await fetch("/call", { method: "POST", body: formData });
+                const replyBlob = await response.blob();
+                const replyUrl = URL.createObjectURL(replyBlob);
+                replayAudio.src = replyUrl;
+                replayAudio.play();
+                status.textContent = "Press and hold the button, speak,  then release.";
+            };
+        }).catch(err => {
+            status.textContent = "Microphone access denied or unavailable: " + err;
+        });
+
+        btn.addEventListener('mousedown', () => {
+            audioChunks = [];
+            mediaRecorder.start();
+            status.textContent = "Listening...";
+        });
+        btn.addEventListener('mouseup', () => {
+            mediaRecorder.stop();
+        });
+    </script>
+</body>
+
+</html>

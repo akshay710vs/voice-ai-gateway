@@ -4,4 +4,5 @@ __pycache__/
 *.pyc
 .env
 *.wav
+*.webm
 node_modules/
